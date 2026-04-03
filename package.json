@@ -8,7 +8,8 @@
     "prepare-src": "node scripts/prepare-src.mjs",
     "build": "npm run prepare-src && node scripts/build.mjs",
     "check": "npm run prepare-src && tsc --noEmit",
-    "start": "node dist/cli.js"
+    "start": "bun run src/entrypoints/cli.tsx",
+    "dev": "bun run src/entrypoints/cli.tsx"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -19,6 +20,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.82.0",
+    "@ant/claude-for-chrome-mcp": "file:stubs/packages/ant-claude-for-chrome-mcp",
+    "@anthropic-ai/sandbox-runtime": "file:stubs/packages/anthropic-sandbox-runtime",
     "@commander-js/extra-typings": "^14.0.0",
     "@growthbook/growthbook": "^1.6.5",
     "@modelcontextprotocol/sdk": "^1.29.0",
@@ -39,7 +42,7 @@
     "cli-cursor": "^5.0.0",
     "cli-truncate": "^5.2.0",
     "code-excerpt": "^4.0.0",
-    "color-diff-napi": "^0.0.1",
+    "color-diff-napi": "file:stubs/packages/color-diff-napi",
     "diff": "^8.0.4",
     "emoji-regex": "^10.6.0",
     "env-paths": "^4.0.0",

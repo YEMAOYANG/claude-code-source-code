@@ -1,0 +1,6 @@
+{
+  "name": "color-diff-napi",
+  "version": "0.0.1",
+  "description": "Stub for color-diff-napi native module",
+  "main": "index.js"
+}

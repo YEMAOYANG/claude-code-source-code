@@ -310,6 +310,72 @@ bun run src/entrypoints/cli.tsx -p "Hello"
 
 ---
 
+## 6.5 Windows 用户指南
+
+### 完整步骤
+
+```powershell
+# 1. 安装 Bun（如果还没有）
+powershell -c "irm bun.sh/install.ps1 | iex"
+
+# 2. 克隆项目
+git clone https://github.com/YEMAOYANG/claude-code-source-code.git
+cd claude-code-source-code
+git checkout build/esbuild-v2.1.88
+
+# 3. 安装依赖（内部 stub 包会通过 file: 协议自动安装）
+bun install
+
+# 4. 验证
+bun run src/entrypoints/cli.tsx --version
+# 应输出：2.1.88 (Claude Code)
+
+# 5. 运行（设置 API key）
+set ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxx
+bun run src/entrypoints/cli.tsx -p "你好"
+
+# 或使用快捷命令
+bun run dev -- --version
+bun run dev -- -p "你好"
+```
+
+### 关于 dist/ 目录
+
+`dist/cli.js` 不包含在 Git 中（需要本地构建）。Windows 用户**推荐直接用 Bun 运行源码**，无需构建：
+
+```powershell
+# ✅ 推荐：直接运行源码
+bun run src/entrypoints/cli.tsx -p "Hello"
+
+# ⚠️ 如果一定要用 Node.js 运行，需要先构建
+npm install
+npm run build
+node dist/cli.js -p "Hello"
+```
+
+### 关于内部 Stub 包
+
+项目依赖 3 个 Anthropic 内部包（在 npm 上不存在或是空壳）。这些包的 stub 实现已放在 `stubs/packages/` 目录中，通过 `package.json` 的 `file:` 协议引用，`bun install` 会自动安装：
+
+| 包名 | 说明 | Stub 位置 |
+|------|------|-----------|
+| `@ant/claude-for-chrome-mcp` | Chrome 浏览器工具 MCP | `stubs/packages/ant-claude-for-chrome-mcp/` |
+| `@anthropic-ai/sandbox-runtime` | 沙箱运行时 | `stubs/packages/anthropic-sandbox-runtime/` |
+| `color-diff-napi` | 原生 diff 着色 | `stubs/packages/color-diff-napi/` |
+
+### Windows 常见问题
+
+**Q: `Cannot find module dist/cli.js`**
+A: 不要用 `npm run start` / `bun start`（旧配置可能指向 dist/）。直接运行 `bun run src/entrypoints/cli.tsx`。
+
+**Q: `Cannot find module '@ant/claude-for-chrome-mcp'`**
+A: 运行 `bun install` 重新安装依赖。如果仍报错，检查 `node_modules/@ant/claude-for-chrome-mcp/index.js` 是否存在。
+
+**Q: PowerShell 中环境变量怎么设？**
+A: 用 `$env:ANTHROPIC_API_KEY = "sk-ant-xxx"` 或 `set ANTHROPIC_API_KEY=sk-ant-xxx`（cmd）。
+
+---
+
 ## 7. 已知问题和限制
 
 ### 7.1 功能限制
@@ -370,7 +436,11 @@ claude-code-source-code/
 ├── stubs/                        # 顶层 stub 文件
 │   ├── bun-bundle.js
 │   ├── bun-ffi.ts
-│   └── global.d.ts
+│   ├── global.d.ts
+│   └── packages/               # 内部包 stub（file: 协议引用）
+│       ├── ant-claude-for-chrome-mcp/
+│       ├── anthropic-sandbox-runtime/
+│       └── color-diff-napi/
 ├── scripts/
 │   └── build.mjs                 # esbuild 构建脚本
 ├── dist/                         # 构建产出目录
