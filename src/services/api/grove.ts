@@ -154,7 +154,7 @@ export async function updateGroveSettings(
  * and fetches in the background if needed. On cold start (no cache), it returns
  * false and the Grove dialog won't show until the next session.
  */
-export async function isQualifiedForGrove(): Promise<boolean> {
+export async function isQualifiedForGrove(): Promise<boolean> { return false; return false; // PATCHED: skip grove
   if (!isConsumerSubscriber()) {
     return false
   }

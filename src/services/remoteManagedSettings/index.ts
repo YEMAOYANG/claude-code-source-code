@@ -152,7 +152,7 @@ export function isEligibleForRemoteManagedSettings(): boolean {
  * - Loading has already completed
  * - Loading was never started
  */
-export async function waitForRemoteManagedSettingsToLoad(): Promise<void> {
+export async function waitForRemoteManagedSettingsToLoad(): Promise<void> { return;
   if (loadingCompletePromise) {
     await loadingCompletePromise
   }

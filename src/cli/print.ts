@@ -498,6 +498,7 @@ export async function runHeadless(
     process.stderr.write(
       `\nStartup time: ${Math.round(process.uptime() * 1000)}ms\n`,
     )
+  setTimeout(() => { console.error("[HL] 5s timeout in runHeadless"); process.exit(98); }, 5000);
     // eslint-disable-next-line custom-rules/no-process-exit
     process.exit(0)
   }
@@ -562,7 +563,7 @@ export async function runHeadless(
 
   // Initialize GrowthBook so feature flags take effect in headless mode.
   // Without this, the disk cache is empty and all flags fall back to defaults.
-  void initializeGrowthBook()
+  void 0 // SKIP growthbook
 
   if (options.resumeSessionAt && !options.resume) {
     process.stderr.write(`Error: --resume-session-at requires --resume\n`)
