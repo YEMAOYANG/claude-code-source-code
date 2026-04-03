@@ -207,12 +207,18 @@ export async function showSetupScreens(root: Root, permissionMode: PermissionMod
     const customApiKeyTruncated = normalizeApiKeyForConfig(process.env.ANTHROPIC_API_KEY);
     const keyStatus = getCustomApiKeyStatus(customApiKeyTruncated);
     if (keyStatus === 'new') {
-      const {
-        ApproveApiKey
-      } = await import('./components/ApproveApiKey.js');
-      await showSetupDialog<boolean>(root, done => <ApproveApiKey customApiKeyTruncated={customApiKeyTruncated} onDone={done} />, {
-        onChangeAppState
-      });
+      // Auto-approve the API key to skip the interactive dialog,
+      // which hangs on Windows due to stdin/Select component issues with bun.
+      saveGlobalConfig(current => ({
+        ...current,
+        customApiKeyResponses: {
+          ...current.customApiKeyResponses,
+          approved: [
+            ...(current.customApiKeyResponses?.approved ?? []),
+            customApiKeyTruncated,
+          ],
+        },
+      }));
     }
   }
   if ((permissionMode === 'bypassPermissions' || allowDangerouslySkipPermissions) && !hasSkipDangerousModePermissionPrompt()) {

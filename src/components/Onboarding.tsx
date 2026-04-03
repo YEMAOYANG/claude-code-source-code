@@ -7,7 +7,7 @@ import { Box, Link, Newline, Text, useTheme } from '../ink.js';
 import { useKeybindings } from '../keybindings/useKeybinding.js';
 import { isAnthropicAuthEnabled } from '../utils/auth.js';
 import { normalizeApiKeyForConfig } from '../utils/authPortable.js';
-import { getCustomApiKeyStatus } from '../utils/config.js';
+import { getCustomApiKeyStatus, saveGlobalConfig } from '../utils/config.js';
 import { env } from '../utils/env.js';
 import { isRunningOnHomespace } from '../utils/envUtils.js';
 import { PreflightStep } from '../utils/preflightChecks.js';
@@ -104,7 +104,19 @@ export function Onboarding({
     }
     const customApiKeyTruncated = normalizeApiKeyForConfig(process.env.ANTHROPIC_API_KEY);
     if (getCustomApiKeyStatus(customApiKeyTruncated) === 'new') {
-      return customApiKeyTruncated;
+      // Auto-approve the API key instead of showing an interactive dialog,
+      // which hangs on Windows due to stdin/Select component issues with bun.
+      saveGlobalConfig(current => ({
+        ...current,
+        customApiKeyResponses: {
+          ...current.customApiKeyResponses,
+          approved: [
+            ...(current.customApiKeyResponses?.approved ?? []),
+            customApiKeyTruncated,
+          ],
+        },
+      }));
+      return ''; // Already approved, no dialog needed
     }
   }, []);
   function handleApiKeyDone(approved: boolean) {
