@@ -156,6 +156,8 @@ for (let round = 1; round <= MAX_ROUNDS; round++) {
       `--outfile="${OUT_FILE}"`,
       `--banner:js=$'#!/usr/bin/env node\\n// Claude Code v${VERSION} (built from source)\\n// Copyright (c) Anthropic PBC. All rights reserved.\\n'`,
       '--packages=external',
+      '--loader:.md=text',
+      '--loader:.txt=text',
       '--external:bun:*',
       '--allow-overwrite',
       '--log-level=error',
@@ -219,7 +221,7 @@ for (let round = 1; round <= MAX_ROUNDS; round++) {
         if (!await exists(p)) {
           const name = cleanMod.split('/').pop().replace(/\.[tj]sx?$/, '')
           const safeName = name.replace(/[^a-zA-Z0-9_$]/g, '_') || 'stub'
-          await writeFile(p, `// Auto-generated stub\nexport default function ${safeName}() {}\nexport const ${safeName} = () => {}\n`, 'utf8')
+          await writeFile(p, `// Auto-generated stub\nexport const ${safeName} = () => {};\nexport default ${safeName};\nexport const __stub = true;\n`, 'utf8')
           stubCount++
         }
       }

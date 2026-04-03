@@ -1756,3 +1756,8 @@ export function setPromptId(id: string | null): void {
   STATE.promptId = id
 }
 
+
+// Stub for non-ant builds
+export function isReplBridgeActive(): boolean { return false; }
+export function getReplBridgeHandle(): null { return null; }
+
