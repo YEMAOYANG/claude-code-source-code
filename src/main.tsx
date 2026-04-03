@@ -1,4 +1,5 @@
 import { setup as _staticSetup } from "./setup.js";
+import { setup as _staticSetup } from "./setup.js";
 // These side-effects must run before all other imports:
 // 1. profileCheckpoint marks entry before heavy module evaluation begins
 // 2. startMdmRawRead fires MDM subprocesses (plutil/reg query) so they run in
@@ -1934,9 +1935,7 @@ async function run(): Promise<CommanderCommand> {
     agentDefsPromise?.catch(() => {});
     await setupPromise;
     logForDebugging(`[STARTUP] setup() completed in ${Date.now() - setupStart}ms`);
-    profileCheckpoint('action_after_setup'); console.error('[CP] after_setup');
-
-    // Replay user messages into stream-json only when the socket was
+    profileCheckpoint('action_after_setup'); // Replay user messages into stream-json only when the socket was
     // explicitly requested. The auto-generated socket is passive — it
     // lets tools inject if they want to, but turning it on by default
     // shouldn't reshape stream-json for SDK consumers who never touch it.
@@ -2239,7 +2238,7 @@ async function run(): Promise<CommanderCommand> {
       });
       logForDebugging('[STARTUP] Running showSetupScreens()...');
       const setupScreensStart = Date.now();
-      console.error('[CP] before showSetupScreens'); const onboardingShown = await showSetupScreens(root, permissionMode, allowDangerouslySkipPermissions, commands, enableClaudeInChrome, devChannels);
+      const onboardingShown = await showSetupScreens(root, permissionMode, allowDangerouslySkipPermissions, commands, enableClaudeInChrome, devChannels);
       logForDebugging(`[STARTUP] showSetupScreens() completed in ${Date.now() - setupScreensStart}ms`);
 
       // Now that trust is established and GrowthBook has auth headers,

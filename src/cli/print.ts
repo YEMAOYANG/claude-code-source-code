@@ -1,6 +1,16 @@
 // biome-ignore-all assist/source/organizeImports: ANT-ONLY import markers must not be reordered
 import { feature } from '../stubs/bun-bundle.js'
 import { readFile, stat } from 'fs/promises'
+
+// PATCH: timeout utility to prevent hanging on unreachable internal services
+async function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  let timer: ReturnType<typeof setTimeout>;
+  return Promise.race([
+    promise,
+    new Promise<T>(resolve => { timer = setTimeout(() => { console.error(`[TIMEOUT] Promise timed out after ${ms}ms`); resolve(fallback); }, ms); })
+  ]).finally(() => clearTimeout(timer!));
+}
+
 import { dirname } from 'path'
 import {
   downloadUserSettings,
@@ -618,7 +628,7 @@ export async function runHeadless(
     // requests to the SDK host via the can_use_tool control_request protocol.
     // This must happen after structuredIO is created so we can send requests.
     try {
-      await SandboxManager.initialize(structuredIO.createSandboxAskCallback())
+      await withTimeout(SandboxManager.initialize(structuredIO.createSandboxAskCallback()), 3000, undefined)
     } catch (err) {
       process.stderr.write(`\n❌ Sandbox Error: ${errorMessage(err)}\n`)
       gracefulShutdownSync(1, 'other')
@@ -675,7 +685,7 @@ export async function runHeadless(
   }
 
   if (options.setupTrigger) {
-    await processSetupHooks(options.setupTrigger)
+    await withTimeout(processSetupHooks(options.setupTrigger), 3000, undefined)
   }
 
   headlessProfilerCheckpoint('before_loadInitialMessages')
@@ -839,7 +849,7 @@ export async function runHeadless(
 
   // Ensure model strings are initialized before generating model options.
   // For Bedrock users, this waits for the profile fetch to get correct region strings.
-  await ensureModelStringsInitialized()
+  await withTimeout(ensureModelStringsInitialized(), 3000, undefined)
   headlessProfilerCheckpoint('after_modelStrings')
 
   // UDS inbox store registration is deferred until after `run` is defined

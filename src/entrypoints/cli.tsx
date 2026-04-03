@@ -1,4 +1,3 @@
-console.error("[DEBUG] cli.tsx loading...");
 import { feature } from '../stubs/bun-bundle.js';
 
 // Bugfix for corepack auto-pinning, which adds yarnpkg to peoples' package.jsons
